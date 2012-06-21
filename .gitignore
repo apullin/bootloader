@@ -1,0 +1,6 @@
+*.o
+*.pyc
+*.cof
+*.hex
+*.map
+*.mcs

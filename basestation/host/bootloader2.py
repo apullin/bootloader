@@ -12,8 +12,9 @@ Modifications on 2010-01-12 (Ver 1.01):
 
 import wx, time, os, sys
 from serial import *
-from lib.scanf import sscanf
-from lib.payload import Payload
+#from lib.scanf import sscanf
+#from lib.payload import Payload
+from scanf import sscanf
 import array
 import numpy as np
 from xbee import XBee
@@ -22,14 +23,14 @@ from xbee import XBee
 """ Modify the following lines as you need """
 ####################################################
 #DEFAULT_SERIAL_PORT = '/dev/tty.STAN-9EDC-SPP'
-DEFAULT_SERIAL_PORT = 'COM9'
+DEFAULT_SERIAL_PORT = 'COM3'
 #DEFAULT_SERIAL_PORT = 'COM5'
 #DEFAULT_BAUD_RATE = 57600
 DEFAULT_BAUD_RATE = 230400
 #DEFAULT_BAUD_RATE = 909091
 #DEFAULT_BAUD_RATE = 921600
-DEFAULT_DEST_ADDR = '\x11\x01'  #0x1101 for Stan's I-Bird
-DEFAULT_HEX_FILE = 'ImageProc2Bootload.hex'
+DEFAULT_DEST_ADDR = '\x20\x52'  #0x1101 for Stan's I-Bird
+DEFAULT_HEX_FILE = 'firmware.production.hex'
 #DEFAULT_HEX_FILE = 'MikroBootload.hex'
 DEFAULT_BASE_HEX_FILE = 'basestationBootload.hex' 
 DEFAULT_LOG_FILE = 'ImageProc2BootloaderLog.txt'

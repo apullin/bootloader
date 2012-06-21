@@ -33,7 +33,7 @@ DEFAULT_HEX_FILE = 'ImageProc2Bootload.hex'
 #DEFAULT_HEX_FILE = 'MikroBootload.hex'
 DEFAULT_BASE_HEX_FILE = 'basestationBootload.hex' 
 DEFAULT_LOG_FILE = 'ImageProc2BootloaderLog.txt'
-#DEFAULT_HEX_DIR = ''
+DEFAULT_HEX_DIR = 'C:\Users\pullin\Desktop\GIT code'
 #####################################################
 
 
