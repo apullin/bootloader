@@ -647,7 +647,10 @@ def run_basestation(argv):
         port = sys.argv[2]
         baud= int(sys.argv[3])
         fname = sys.argv[4]
+        print "Command line bootloader, port = ",port," , baud = ",baud
+        print "firmware file: ",fname
         run_bootloader(port, baud, fname)
+
         
 
 def run_imageproc2(argv):
@@ -674,6 +677,8 @@ def run_imageproc2(argv):
         port = sys.argv[1]
         baud= int(sys.argv[2])
         fname = sys.argv[3]
+        print "Command line bootloader, port = ",port," , baud = ",baud
+        print "firmware file: ",fname
         run_bootloader(port, baud, fname)
         
 
@@ -686,8 +691,10 @@ if __name__ == '__main__':
         app.MainLoop()
 
     elif sys.argv[1] == 'base':
+        print "Running bootloader for Basestation board."
         run_basestation(sys.argv)
 
 
     else:
+        print "Running bootloader for ImageProc2 board."
         run_imageproc2(sys.argv)
