@@ -20,19 +20,32 @@ import array
 import numpy as np
 from xbee import XBee
 import argparse
+from struct import unpack, pack
+
+DEFAULT_LOG_FILE = 'log.txt'
 
 parser = argparse.ArgumentParser(description='Command line bootloader for ImageProc2 boards.')
-parser.add_argument('--base', help='Basestation board')
-parser.add_argument('--ip2', help='ImageProc2 board')
-parser.add_argument('--pan','-p', help='PAN ID', type=str,required=True, dest='DEST_ADDR')
-parser.add_argument('--source','-s', help='Source ID ; will attempt to switch Xbee SRC_ADDR', \
-        type=str, required=True, dest='SRC_ADDR')
-parser.add_argument('--dest','-d', help='PAN ID',  type=str, required=True, dest='PAN_ID')
+parser.add_argument('--base', help='Basestation board', action='store_true')
+parser.add_argument('--ip2', help='ImageProc2 board', action='store_true')
+#parser.add_argument('--channel','-c', help='802.15.4 channel',  type=str, required=True, dest='RADIO_CHAN')
+#parser.add_argument('--pan','-p', help='PAN ID', type=int,required=True, dest='DEST_ADDR')
+#parser.add_argument('--source','-s', help='Source ID ; will attempt to switch Xbee SRC_ADDR', \
+#        type=str, required=True, dest='SRC_ADDR')
+parser.add_argument('--dest','-d', help='Destination address',  type=str, required=True, dest='DEST_ADDR')
 parser.add_argument('--COMPORT','-C', help='Serial COM Port',  type=str, required=True, dest='COMPORT')
 parser.add_argument('--baudrate','-b', help='Serial Baud Rate',  type=str, required=True, dest='BAUDRATE')
 parser.add_argument('--file','-f', help='Hex file to bootload',  type=str, required=True, dest='HEXFILE')
 
-parser.parse_args()
+args = parser.parse_args()
+base = args.base
+ip2=args.ip2
+#RADIO_CHAN = pack('b',args.RADIO_CHAN)
+#PAN_ID = pack('>h',args.PAN_ID) #turns into two-byte string
+#SRC_ADDR = eval(args.SRC_ADDR) #turns into two-byte string
+DEST_ADDR = pack('>h',eval(args.DEST_ADDR)) #turns into two-byte string
+COMPORT = args.COMPORT
+BAUDRATE = args.BAUDRATE
+HEXFILE = args.HEXFILE
 
 
 IMAGEPROC2_MODE = 0
@@ -84,7 +97,7 @@ class LogGenerator(object):
 
 
 class BaseStation(object):
-    def __init__(self, port = DEFAULT_SERIAL_PORT, baud = DEFAULT_BAUD_RATE, dest_addr = DEFAULT_DEST_ADDR):
+    def __init__(self, port, baud, dest_addr):
         self.ser = Serial(port, baud, timeout = 1)
         self.ser.writeTimeout = 5
         self.xb = XBee(self.ser)
@@ -244,9 +257,8 @@ class Bootloader(object):
                     ("dsPIC33FJ256GP710", 0xFF, 3, 0, "dsPIC33F"),  # revision ID unknown yet
                     ("dsPIC33FJ256MC710", 0xBF, 3, 0, "dsPIC33F") ) # revision ID unknown yet 
 
-    def __init__(self, mode = IMAGEPROC2_MODE, gui = 0):
+    def __init__(self, mode = IMAGEPROC2_MODE):
         self.device = self.DEVICE_ID
-        self.gui = gui
         self.mode = mode
         self.conn = None
         self.hexFile = None
@@ -274,11 +286,12 @@ class Bootloader(object):
 
     def Connect(self, port, baud):
         if self.conn is not None:
+            print "Already  have a connection"
             return True
        
         try:
             if self.mode == IMAGEPROC2_MODE:
-                self.conn = BaseStation(port, baud)
+                self.conn = BaseStation(port, baud, DEST_ADDR)
             else:
                 self.conn = Serial(port, baud, timeout = 1)
                 self.conn.writeTimeout = 5
@@ -286,6 +299,7 @@ class Bootloader(object):
         except SerialException:
             print "Bootloader.Connect(): SerialException"
             self.conn = None
+            sys.exit(0)
             return False
         
         return True
@@ -387,7 +401,6 @@ class Bootloader(object):
         while (count < row_size*3):
             text = "0x%06x: %02x%02x%02x" %(read_addr, 
                     ord(buffer[count+2]), ord(buffer[count+1]), ord(buffer[count]))
-            #self.gui.println(text)
             print text
             count = count + 3
             read_addr = read_addr + 2
@@ -443,10 +456,9 @@ class Bootloader(object):
 
 
 def run_basestation(argv):
-    def run_bootloader(port = DEFAULT_SERIAL_PORT, baud = DEFAULT_BAUD_RATE, fname = DEFAULT_BASE_HEX_FILE):
+    def run_bootloader(port , baud , fname ):
         bl = Bootloader(BASESTATION_MODE)
         bl.Connect(port, baud)
-        print "run bootloader"
         device = bl.ReadID()
         print device + " is found."
         print "Bootloader firmware version: " + bl.GetVersion()
@@ -459,22 +471,13 @@ def run_basestation(argv):
             bl.SendReset()        
         bl.Close()
 
-    if argv[2] == 'default':
-        run_bootloader()
-    else:   
-        # for Win32 with iPython run:        
-        # %run bootloader2 base COM9 230400 ../ImageProc2/ImageProc2Bootload.hex
-        port = sys.argv[2]
-        baud= int(sys.argv[3])
-        fname = sys.argv[4]
-        print "Command line bootloader, port = ",port," , baud = ",baud
-        print "firmware file: ",fname
-        run_bootloader(port, baud, fname)
+    # Invoke method, basestation specific
+    run_bootloader(COMPORT, BAUDRATE, HEXFILE)
 
         
 
-def run_imageproc2(argv):
-    def run_bootloader(port = DEFAULT_SERIAL_PORT, baud = DEFAULT_BAUD_RATE, fname = DEFAULT_HEX_FILE):
+def run_imageproc2():
+    def run_bootloader(port, baud, fname):
         bl = Bootloader()
         bl.Connect(port, baud)
         device = bl.ReadID()
@@ -489,27 +492,29 @@ def run_imageproc2(argv):
             bl.SendReset()        
         bl.Close()
 
-    if argv[1] == 'default':
-        run_bootloader()
-    else:   
-        # for Win32 with iPython run:        
-        # %run bootloader2 COM9 230400 ../ImageProc2/ImageProc2Bootload.hex
-        port = sys.argv[1]
-        baud= int(sys.argv[2])
-        fname = sys.argv[3]
-        print "Command line bootloader, port = ",port," , baud = ",baud
-        print "firmware file: ",fname
-        run_bootloader(port, baud, fname)
+    #Invoke method, ImageProc2 specific
+    run_bootloader(COMPORT, BAUDRATE, HEXFILE)
         
 
 
 if __name__ == '__main__':
+    
+    #print "Radio channel : ", "0x%02X" % unpack('b',RADIO_CHAN)[0]
+    #print "Radio channel : ", "set manually"
+    #print "PAN ID        : ", "0x%04X" % unpack('>h',PAN_ID)[0]
+    #print "Source Addr   : ", "0x%04X" % unpack('>h',SRC_ADDR)[0]
+    #print "Source Addr   : ", "set manually"
+    print "Dest Addr     : ", "0x%04X" % unpack('>h',DEST_ADDR)[0]
+    
+    if base and ip2:
+        print "Cannot specific both --base and --ip2 , choose only one board type."
+        sys.exit(0)
 
-    if sys.argv[1] == 'base':
+    if base:
         print "Running bootloader for Basestation board."
-        run_basestation(sys.argv)
+        run_basestation()
 
 
     else:
         print "Running bootloader for ImageProc2 board."
-        run_imageproc2(sys.argv)
+        run_imageproc2()

@@ -180,20 +180,20 @@ typedef MacPacketStruct* MacPacket;
 
 
 // default value for MAC HEADER
-
+/*
 #define DEFAULT_CHANNEL         0x19
 #define DEFAULT_DEST_PAN_ID     0x1100
 #define DEFAULT_SRC_PAN_ID      0x1100
-#define DEFAULT_DEST_ADDR       0x1020
+#define DEFAULT_DEST_ADDR       0x1000
 #define DEFAULT_SRC_ADDR        0x1101
+*/
 
-/*
 #define DEFAULT_CHANNEL         0x19
 #define DEFAULT_DEST_PAN_ID     0x2050
 #define DEFAULT_SRC_PAN_ID      0x2050
 #define DEFAULT_DEST_ADDR       0x2051
 #define DEFAULT_SRC_ADDR        0x2052
-*/
+
 // packet types
 #define PACKET_TYPE_BEACON      0x00
 #define PACKET_TYPE_DATA        0x01
