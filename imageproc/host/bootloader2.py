@@ -22,16 +22,16 @@ from xbee import XBee
 """ Modify the following lines as you need """
 ####################################################
 #DEFAULT_SERIAL_PORT = '/dev/tty.STAN-9EDC-SPP'
-DEFAULT_SERIAL_PORT = 'COM9'
+DEFAULT_SERIAL_PORT = 'COM7'
 #DEFAULT_SERIAL_PORT = 'COM5'
-#DEFAULT_BAUD_RATE = 57600
-DEFAULT_BAUD_RATE = 230400
+DEFAULT_BAUD_RATE = 57600
+#DEFAULT_BAUD_RATE = 230400
 #DEFAULT_BAUD_RATE = 909091
 #DEFAULT_BAUD_RATE = 921600
-DEFAULT_DEST_ADDR = '\x11\x01'  #0x1101 for Stan's I-Bird
-DEFAULT_HEX_FILE = 'ImageProc2Bootload.hex'
+DEFAULT_DEST_ADDR = '\x20\x52'  #0x1101 for Stan's I-Bird
+DEFAULT_HEX_FILE = 'firmware.hex'
 #DEFAULT_HEX_FILE = 'MikroBootload.hex'
-DEFAULT_BASE_HEX_FILE = 'basestationBootload.hex' 
+DEFAULT_BASE_HEX_FILE = 'firmware.hex' 
 DEFAULT_LOG_FILE = 'ImageProc2BootloaderLog.txt'
 DEFAULT_HEX_DIR = 'C:\Users\pullin\Desktop\GIT code'
 #####################################################
